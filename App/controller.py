@@ -31,7 +31,48 @@ El controlador se encarga de mediar entre la vista y el modelo.
 
 # Inicialización del Catálogo de libros
 
+def init():
+    analyzer = model.newAnalyzer()
+    return analyzer
+
 # Funciones para la carga de datos
+
+def loadData(analyzer):
+
+    loadLandingPoints(analyzer, 'landing_points.csv')
+    loadCountry(analyzer, 'countries.csv')
+    loadConnection(analyzer, 'connections.csv')
+    model.addCountriestoCapitalCity(analyzer)
+
+def loadLandingPoints(analyzer, file):
+
+    file = cf.data_dir + file
+    input_file = csv.DictReader(open(file, encoding="utf-8"), delimiter = ",")
+
+    for landing_point in input_file:
+        model.addLandingPoint(analyzer, landing_point)
+    return analyzer
+
+def loadCountry(analyzer, file):
+
+    file = cf.data_dir + file
+    input_file = csv.DictReader(open(file, encoding="utf-8"), delimiter = ",")
+
+    for country in input_file:
+        model.addCountry(analyzer, country)
+    return analyzer
+
+def loadConnection(analyzer, file):
+
+    file = cf.data_dir + file
+    input_file = csv.DictReader(open(file, encoding="utf-8"), delimiter = ",")
+
+    for connection in input_file:
+        model.addConnection(analyzer, connection)
+    model.addSameOrigin(analyzer)
+    return analyzer
+
+
 
 # Funciones de ordenamiento
 
