@@ -39,6 +39,7 @@ def printMenu():
     print("Bienvenido")
     print("1- Cargar información en el catálogo")
     print("2- ")
+    print('3 - Requerimiento 2')
 
 catalog = None
 
@@ -57,7 +58,8 @@ while True:
 
     elif int(inputs[0]) == 2:
         pass
-
+    elif int(inputs[0]) == 3:
+         controller.Requerimiento2(analyzer)
     else:
         sys.exit(0)
 sys.exit(0)

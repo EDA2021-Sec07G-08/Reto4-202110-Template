@@ -72,6 +72,10 @@ def loadConnection(analyzer, file):
     model.addSameOrigin(analyzer)
     return analyzer
 
+def Requerimiento2(analyzer):
+    print('entre')
+    return model.Requerimiento2(analyzer)
+
 
 
 # Funciones de ordenamiento

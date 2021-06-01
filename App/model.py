@@ -25,6 +25,7 @@
  """
 
 
+from DISClib.DataStructures.arraylist import newList
 from DISClib.DataStructures.chaininghashtable import contains
 import config as cf
 from DISClib.ADT import list as lt
@@ -179,3 +180,14 @@ def addCountriestoCapitalCity(analyzer):
 # Funciones utilizadas para comparar elementos dentro de una lista
 
 # Funciones de ordenamiento
+def Requerimiento2(analyzer):
+    vertic = gr.vertices(analyzer['connections'])
+    mapaR = mp.newMap()
+    listaR = lt.newList()
+    
+    for i in range (0,lt.size(vertic)):
+        vertix = lt.getElement(vertic,i)
+        vert_adya = gr.degree(analyzer['connections'],vertix)
+        lt.addLast (listaR,(vert_adya,vertix))
+
+
