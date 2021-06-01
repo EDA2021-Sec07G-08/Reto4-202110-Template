@@ -25,11 +25,13 @@
  """
 
 
+from DISClib.DataStructures.chaininghashtable import contains
 import config as cf
 from DISClib.ADT import list as lt
 from DISClib.ADT import map as mp
 from DISClib.DataStructures import mapentry as me
 from DISClib.Algorithms.Sorting import shellsort as sa
+from DISClib.ADT import orderedmap as om
 from DISClib.ADT import graph as gr
 assert cf
 
@@ -43,12 +45,16 @@ los mismos.
 def newAnalyzer():
 
     analyzer = {
+                'vertices':None,
+                'info_landings': None,
                 'landing_points' : None,
                 'countries' : None,
                 'connections': None,
                 'cities_country' : None
                 }
-    analyzer['landing_points'] = mp.newMap(maptype='PROBING')
+    analyzer['vertices'] = lt.newList()
+
+    analyzer['landing_points'] = om.newMap()
 
     analyzer['countries'] = mp.newMap(maptype= 'PROBING')
 
@@ -82,8 +88,9 @@ def addLandingPoint(analyzer, landing_point):
         dict_landing['country'] = lista[3]
     dict_landing['latitude'] = landing_point['latitude']
     dict_landing['longitude'] = landing_point['longitude']
+    dict_landing['cables'] = lt.newList()
 
-    mp.put(analyzer['landing_points'], landing_point['landing_point_id'], dict_landing)
+    om.put(analyzer['landing_points'], landing_point['landing_point_id'], dict_landing)
 
 def addCountry(analyzer, country):
     mp.put(analyzer['countries'], country['CountryName'], country)
@@ -105,37 +112,52 @@ def addConnection(analyzer, connection):
     verticeA = "<{}>-<{}>".format(origin, cable_id)
     verticeB = "<{}>-<{}>".format(destination, cable_id)
 
-    gr.insertVertex(analyzer['connections'], verticeA)
-    gr.insertVertex(analyzer['connections'], verticeB)
+    listilla = [origin, cable_id, verticeA]
+
+    lt.addLast(analyzer['vertices'], listilla)
+
+    mapa = analyzer['landing_points']
+    pareja = om.get(mapa, origin)
+    valor = me.getValue(pareja)
+    lista_cables = valor['cables']
+    lt.addLast(lista_cables, verticeA)
+
+    containsA = gr.containsVertex(analyzer['connections'], verticeA)
+    containsB = gr.containsVertex(analyzer['connections'], verticeB)
+    if not containsA:
+        gr.insertVertex(analyzer['connections'], verticeA)
+    if not containsB:
+        gr.insertVertex(analyzer['connections'], verticeB)
+    
     gr.addEdge(analyzer['connections'], verticeA, verticeB, cable_lenght)
 
 def addSameOrigin(analyzer):
 
-    vertices = gr.vertices(analyzer['connections'])
+    info = om.valueSet(analyzer['landing_points'])
 
-    for i in range(lt.size(vertices)):
-        verticeA = lt.getElement(vertices, i)
-        parejaA = verticeA.replace('<', '').replace('>', '').split('-')
-        originA = parejaA[0]
-        cableA = parejaA[1]
-        for j in range(lt.size(vertices)):
-            verticeB = lt.getElement(vertices, j)
-            parejaB = verticeB.replace('<', '').replace('>', '').split('-')
-            originB = parejaB[0]
-            cableB = parejaB[1]
-            if originA == originB and cableA != cableB:
-                gr.addEdge(analyzer['connections'], verticeA, verticeB, 100)
+    for i in range(lt.size(info)):
+        diccionario = lt.getElement(info, i)
+        lista_cables = diccionario['cables']
+        for i in range(lt.size(lista_cables)):
+            verticeA = lt.getElement(lista_cables, i)
+            cont = 1
+            j = i
+            while j + cont <= lt.size(lista_cables):
+                verticeB = lt.getElement(lista_cables, j + cont)
+                if verticeA != verticeB:
+                    gr.addEdge(analyzer['connections'], verticeA, verticeB, 100)
+                cont += 1
 
 def addCountriestoCapitalCity(analyzer):
 
-    vertices = gr.vertices(analyzer['connections'])
+    vertices = analyzer['vertices']
     map_landing = analyzer['landing_points']
 
     for i in range(lt.size(vertices)):
-        vertice = lt.getElement(vertices, i)
-        parejaA = vertice.replace('<', '').replace('>', '').split('-')
+        parejaA = lt.getElement(vertices, i)
         origenA = parejaA[0]
-        pareja = mp.get(map_landing, origenA)
+        vertice = parejaA[2]
+        pareja = om.get(map_landing, origenA)
         info = me.getValue(pareja)
         pais = info['country']
 
@@ -143,6 +165,8 @@ def addCountriestoCapitalCity(analyzer):
         if not contains:
             gr.insertVertex(analyzer['connections'], pais)
             gr.addEdge(analyzer['connections'], pais, vertice)
+            lista_add = analyzer['vertices']
+            lt.addLast(lista_add, pais)
         if contains: 
             gr.addEdge(analyzer['connections'], pais, vertice)
   
