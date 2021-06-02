@@ -34,6 +34,7 @@ from DISClib.DataStructures import mapentry as me
 from DISClib.Algorithms.Sorting import shellsort as sa
 from DISClib.ADT import orderedmap as om
 from DISClib.ADT import graph as gr
+import haversine as hs
 assert cf
 
 """
@@ -103,12 +104,32 @@ def addCountry(analyzer, country):
     dict_capital['CapitalLongitude'] = country['CapitalLongitude']
     mp.put(analyzer['capitals'], country['CountryName'], dict_capital)
 
+def DistanceHaversine(lp1,lp2, analyzer):
+
+    map_landing = analyzer['landing_points']
+
+    pareja_lp1 = om.get(map_landing, lp1)
+    dict_lp1 = me.getValue(pareja_lp1)
+    latitude_lp1 = dict_lp1['latitude']
+    longitude_lp1 = dict_lp1['longitude']
+    
+    pareja_lp2 = om.get(map_landing, lp2)
+    dict_lp2 = me.getValue(pareja_lp2)
+    latitude_lp2 = dict_lp2['latitude']
+    longitude_lp2 = dict_lp2['longitude']
+
+    loc_lp1 = (latitude_lp1, longitude_lp1)
+    loc_lp2 = (latitude_lp2, longitude_lp2)
+
+    distance = hs.haversine(loc_lp1, loc_lp2)
+
+    return distance
 
 def addConnection(analyzer, connection):
     origin = connection['\ufefforigin']
     destination = connection['destination']
     cable_id = connection['cable_id']
-    cable_lenght = connection['cable_length']
+    cable_lenght = DistanceHaversine(origin, destination,analyzer)
 
     verticeA = "<{}>-<{}>".format(origin, cable_id)
     verticeB = "<{}>-<{}>".format(destination, cable_id)
@@ -188,6 +209,9 @@ def Requerimiento2(analyzer):
     for i in range (0,lt.size(vertic)):
         vertix = lt.getElement(vertic,i)
         vert_adya = gr.degree(analyzer['connections'],vertix)
-        lt.addLast (listaR,(vert_adya,vertix))
+        print(vertix)
+        print(vert_adya)
+        lt.addLast(listaR,(vert_adya,vertix))
+
 
 
