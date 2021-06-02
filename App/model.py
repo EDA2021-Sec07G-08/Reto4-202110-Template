@@ -34,7 +34,7 @@ from DISClib.DataStructures import mapentry as me
 from DISClib.Algorithms.Sorting import shellsort as sa
 from DISClib.ADT import orderedmap as om
 from DISClib.ADT import graph as gr
-import haversine as hs
+from DISClib import haversine as hs
 assert cf
 
 """
@@ -110,13 +110,13 @@ def DistanceHaversine(lp1,lp2, analyzer):
 
     pareja_lp1 = om.get(map_landing, lp1)
     dict_lp1 = me.getValue(pareja_lp1)
-    latitude_lp1 = dict_lp1['latitude']
-    longitude_lp1 = dict_lp1['longitude']
+    latitude_lp1 = float(dict_lp1['latitude'])
+    longitude_lp1 = float(dict_lp1['longitude'])
     
     pareja_lp2 = om.get(map_landing, lp2)
     dict_lp2 = me.getValue(pareja_lp2)
-    latitude_lp2 = dict_lp2['latitude']
-    longitude_lp2 = dict_lp2['longitude']
+    latitude_lp2 = float(dict_lp2['latitude'])
+    longitude_lp2 = float(dict_lp2['longitude'])
 
     loc_lp1 = (latitude_lp1, longitude_lp1)
     loc_lp2 = (latitude_lp2, longitude_lp2)
