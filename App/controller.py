@@ -69,11 +69,12 @@ def loadConnection(analyzer, file):
 
     for connection in input_file:
         model.addConnection(analyzer, connection)
+        model.addConnection_directed(analyzer, connection)
     model.addSameOrigin(analyzer)
+    model.addSameOrigin_directed(analyzer)
     return analyzer
 
 def Requerimiento2(analyzer):
-    print('entre')
     return model.Requerimiento2(analyzer)
 
 def Requerimiento5(analyzer, landing_point_id):

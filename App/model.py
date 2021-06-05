@@ -48,10 +48,13 @@ def newAnalyzer():
 
     analyzer = {
                 'vertices':None,
+                'element':None,
+                'landing_names_id':None,
                 'info_landings': None,
                 'landing_points' : None,
                 'countries' : None,
                 'connections': None,
+                'connections_directed': None,
                 'cities_country' : None
                 }
     analyzer['vertices'] = lt.newList()
@@ -63,6 +66,8 @@ def newAnalyzer():
     analyzer['countries'] = mp.newMap(maptype= 'PROBING')
 
     analyzer['connections'] = gr.newGraph(datastructure='ADJ_LIST', directed = False)
+
+    analyzer['connections_directed'] = gr.newGraph(datastructure='ADJ_LIST', directed = True)
 
     analyzer['cities_country'] = mp.newMap(maptype = 'PROBING')
 
@@ -161,6 +166,32 @@ def addConnection(analyzer, connection):
         lista_cables = valor['cables']
         lt.addLast(lista_cables, verticeA)
 
+def addConnection_directed(analyzer, connection):
+    origin = connection['\ufefforigin']
+    destination = connection['destination']
+    cable_id = connection['cable_name']
+    cable_lenght = DistanceHaversine(origin, destination,analyzer)
+
+    verticeA = "<{}>-<{}>".format(origin, cable_id)
+    verticeB = "<{}>-<{}>".format(destination, cable_id)
+
+    containsA = gr.containsVertex(analyzer['connections_directed'], verticeA)
+    containsB = gr.containsVertex(analyzer['connections_directed'], verticeB)
+    if not containsA and not containsB:
+        gr.insertVertex(analyzer['connections_directed'], verticeA)
+        gr.insertVertex(analyzer['connections_directed'], verticeB)
+
+        listilla = [origin, cable_id, verticeA]
+
+        lt.addLast(analyzer['vertices'], listilla)
+
+        mapa = analyzer['landing_points']
+        pareja = om.get(mapa, origin)
+        valor = me.getValue(pareja)
+        lista_cables = valor['cables']
+        lt.addLast(lista_cables, verticeA)
+    gr.addEdge(analyzer['connections_directed'], verticeA, verticeB, cable_lenght)
+
 def addSameOrigin(analyzer):
 
     info = om.valueSet(analyzer['landing_points'])
@@ -176,6 +207,23 @@ def addSameOrigin(analyzer):
                 verticeB = lt.getElement(lista_cables, j + cont)
                 if verticeA != verticeB:
                     gr.addEdge(analyzer['connections'], verticeA, verticeB, 100)
+                cont += 1
+
+def addSameOrigin_directed(analyzer):
+
+    info = om.valueSet(analyzer['landing_points'])
+
+    for i in range(lt.size(info)):
+        diccionario = lt.getElement(info, i)
+        lista_cables = diccionario['cables']
+        for i in range(lt.size(lista_cables)):
+            verticeA = lt.getElement(lista_cables, i)
+            cont = 0
+            j = 1
+            while j + cont <= lt.size(lista_cables):
+                verticeB = lt.getElement(lista_cables, j + cont)
+                if verticeA != verticeB:
+                    gr.addEdge(analyzer['connections_directed'], verticeA, verticeB, 100)
                 cont += 1
 
 def addCountriestoCapitalCity(analyzer):

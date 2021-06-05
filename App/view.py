@@ -54,7 +54,9 @@ while True:
         analyzer = controller.init()
         data = controller.loadData(analyzer)
         grafo = analyzer['connections']
+        grafo_direc = analyzer['connections_directed']
         print(gr.numEdges(grafo))
+        print(gr.numEdges(grafo_direc))
 
     elif int(inputs[0]) == 2:
         pass
