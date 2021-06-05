@@ -74,6 +74,9 @@ def loadConnection(analyzer, file):
     model.addSameOrigin_directed(analyzer)
     return analyzer
 
+def Requerimiento1(analyzer,landing1,landing2):
+    return model.Requerimiento1(analyzer,landing1,landing2)
+
 def Requerimiento2(analyzer):
     return model.Requerimiento2(analyzer)
 

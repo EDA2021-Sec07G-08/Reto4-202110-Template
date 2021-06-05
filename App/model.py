@@ -36,6 +36,7 @@ from DISClib.ADT import orderedmap as om
 from DISClib.ADT import graph as gr
 from DISClib import haversine as hs
 assert cf
+from DISClib.Algorithms.Graphs import scc
 
 """
 Se define la estructura de un catálogo de videos. El catálogo tendrá dos listas, una para los videos, otra para las categorias de
@@ -178,7 +179,6 @@ def addConnection_directed(analyzer, connection):
     verticeA = "<{}>-<{}>".format(origin, cable_id)
     verticeB = "<{}>-<{}>".format(destination, cable_id)
 
-    print(verticeA, verticeB)
 
     containsA = gr.containsVertex(analyzer['connections_directed'], verticeA)
     containsB = gr.containsVertex(analyzer['connections_directed'], verticeB)
@@ -263,6 +263,22 @@ def addCountriestoCapitalCity(analyzer):
 # Funciones utilizadas para comparar elementos dentro de una lista
 
 # Funciones de ordenamiento
+
+def Requerimiento1(analyzer,landing1,landing2):
+    analyzer['element'] = scc.KosarajuSCC(analyzer['connections_directed'])
+    cluster_number = scc.connectedComponents(analyzer['element'])
+    get_landing1 = mp.get(analyzer['landing_names_id'],landing1)
+    id_landing1 = me.getValue(get_landing1) 
+    get_landing2 = mp.get(analyzer['landing_names_id'],landing2)
+    id_landing2 = me.getValue(get_landing2)
+    inform_cluster = scc.stronglyConnected(analyzer['element'],id_landing1,id_landing2)
+
+    if inform_cluster == False:
+        print('Los landing points consultados no estan en el mismo cluster')
+    else:
+        print('Los landing points cosnultados se encuentran en el mismo cluster')
+        print('El total de clústers presentes en la red es igual a '+ cluster_number)
+
 def Requerimiento2(analyzer):
     vertic = gr.vertices(analyzer['connections'])
     mapaR = mp.newMap()

@@ -38,7 +38,7 @@ operación solicitada
 def printMenu():
     print("Bienvenido")
     print("1- Cargar información en el catálogo")
-    print("2- ")
+    print("2 - Requerimiento 1")
     print('3 - Requerimiento 2')
 
 catalog = None
@@ -59,7 +59,10 @@ while True:
         print(gr.numEdges(grafo_direc))
 
     elif int(inputs[0]) == 2:
-        pass
+        landing1 = input('Ingrese el nombre del landing point 1: ')
+        landing2 = input('Ingrese el nombre del landing point 2: ')
+        controller.Requerimiento1(analyzer,landing1,landing2)
+        
     elif int(inputs[0]) == 3:
          controller.Requerimiento2(analyzer)
     elif int(inputs[0]) == 6:
