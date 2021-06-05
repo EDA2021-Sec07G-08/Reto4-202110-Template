@@ -58,6 +58,8 @@ def newAnalyzer():
 
     analyzer['landing_points'] = om.newMap()
 
+    analyzer['landing_names_id'] = mp.newMap()
+
     analyzer['countries'] = mp.newMap(maptype= 'PROBING')
 
     analyzer['connections'] = gr.newGraph(datastructure='ADJ_LIST', directed = False)
@@ -71,28 +73,36 @@ def newAnalyzer():
 # Funciones para agregar informacion al catalogo
 
 def addLandingPoint(analyzer, landing_point):
-    dict_landing = {}
-    dict_landing['landing_point_id'] = landing_point['landing_point_id']
-    dict_landing['id'] = landing_point['id']
-    lista = landing_point['name']
-    lista = lista.split(',')
-    if len(lista) == 1:
-        dict_landing['city'] = lista[0]
-        dict_landing['country'] = lista[0]
-    elif len(lista) == 2:
-        dict_landing['city'] = lista[0]
-        dict_landing['country'] = lista[1]
-    elif len(lista) == 3:
-        dict_landing['city'] = lista[0]
-        dict_landing['country'] = lista[2]
-    elif len(lista) == 4:
-        dict_landing['city'] = lista[0]
-        dict_landing['country'] = lista[3]
-    dict_landing['latitude'] = landing_point['latitude']
-    dict_landing['longitude'] = landing_point['longitude']
-    dict_landing['cables'] = lt.newList()
 
-    om.put(analyzer['landing_points'], landing_point['landing_point_id'], dict_landing)
+    contains_map1 = om.contains(analyzer['landing_points'], landing_point['landing_point_id'])
+    if not contains_map1:
+        dict_landing = {}
+        dict_landing['landing_point_id'] = landing_point['landing_point_id']
+        dict_landing['id'] = landing_point['id']
+        lista = landing_point['name']
+        lista = lista.split(',')
+        if len(lista) == 1:
+            dict_landing['city'] = lista[0]
+            dict_landing['country'] = lista[0]
+        elif len(lista) == 2:
+            dict_landing['city'] = lista[0]
+            dict_landing['country'] = lista[1]
+        elif len(lista) == 3:
+            dict_landing['city'] = lista[0]
+            dict_landing['country'] = lista[2]
+        elif len(lista) == 4:
+            dict_landing['city'] = lista[0]
+            dict_landing['country'] = lista[3]
+        dict_landing['latitude'] = landing_point['latitude']
+        dict_landing['longitude'] = landing_point['longitude']
+        dict_landing['cables'] = lt.newList()
+
+        om.put(analyzer['landing_points'], landing_point['landing_point_id'], dict_landing)
+
+    contains_map2 = mp.contains(analyzer['landing_names_id'], landing_point['id'])
+
+    if not contains_map2:
+        mp.put(analyzer['landing_names_id'], landing_point['name'], landing_point['landing_point_id'])
 
 def addCountry(analyzer, country):
     mp.put(analyzer['countries'], country['CountryName'], country)
@@ -128,30 +138,28 @@ def DistanceHaversine(lp1,lp2, analyzer):
 def addConnection(analyzer, connection):
     origin = connection['\ufefforigin']
     destination = connection['destination']
-    cable_id = connection['cable_id']
+    cable_id = connection['cable_name']
     cable_lenght = DistanceHaversine(origin, destination,analyzer)
 
     verticeA = "<{}>-<{}>".format(origin, cable_id)
     verticeB = "<{}>-<{}>".format(destination, cable_id)
 
-    listilla = [origin, cable_id, verticeA]
-
-    lt.addLast(analyzer['vertices'], listilla)
-
-    mapa = analyzer['landing_points']
-    pareja = om.get(mapa, origin)
-    valor = me.getValue(pareja)
-    lista_cables = valor['cables']
-    lt.addLast(lista_cables, verticeA)
-
     containsA = gr.containsVertex(analyzer['connections'], verticeA)
     containsB = gr.containsVertex(analyzer['connections'], verticeB)
-    if not containsA:
+    if not containsA and not containsB:
         gr.insertVertex(analyzer['connections'], verticeA)
-    if not containsB:
         gr.insertVertex(analyzer['connections'], verticeB)
-    
-    gr.addEdge(analyzer['connections'], verticeA, verticeB, cable_lenght)
+        gr.addEdge(analyzer['connections'], verticeA, verticeB, cable_lenght)
+
+        listilla = [origin, cable_id, verticeA]
+
+        lt.addLast(analyzer['vertices'], listilla)
+
+        mapa = analyzer['landing_points']
+        pareja = om.get(mapa, origin)
+        valor = me.getValue(pareja)
+        lista_cables = valor['cables']
+        lt.addLast(lista_cables, verticeA)
 
 def addSameOrigin(analyzer):
 
@@ -212,6 +220,56 @@ def Requerimiento2(analyzer):
         print(vertix)
         print(vert_adya)
         lt.addLast(listaR,(vert_adya,vertix))
+
+
+def Requerimiento5(analyzer, landing_point_name):
+
+    map_respuesta = mp.newMap()
+
+    #encontrar codigo con nombre
+
+    mapa_codigo = analyzer['landing_names_id']
+    pareja_codigo = mp.get(mapa_codigo, landing_point_name)
+    codigo = me.getValue(pareja_codigo)
+
+    #sacar vertices de este landing point (unicamente estara conectado a un vertice de pais y es el vertice de su mismo pais)
+
+    mapa_vertices = analyzer['landing_points']
+    pareja_vertices = om.get(mapa_vertices, codigo)
+    dict_landing = me.getValue(pareja_vertices)
+    lista_vertices = dict_landing['cables']
+
+    for i in range(lt.size(lista_vertices)):
+        vertice = lt.getElement(lista_vertices, i)
+        arcos_vertice = gr.adjacents(analyzer['connections'], vertice)
+        for i in range(lt.size(arcos_vertice)):
+
+            vertice2 = lt.getElement(arcos_vertice, i)
+
+
+            tuple_vertice2 = vertice2.replace('<','').replace('>', '').split('-')
+            origen = tuple_vertice2[0]
+
+            contains_landing = om.contains(analyzer['landing_points'], origen)
+
+            if contains_landing:
+
+            #extraer pais del origen
+
+                pareja_origen = om.get(analyzer['landing_points'], origen)
+                dict_origen = me.getValue(pareja_origen)
+                pais = dict_origen['country']
+
+                contains_country = mp.contains(map_respuesta, pais)
+
+                if not contains_country:
+                    mp.put(map_respuesta, pais, 0)
+
+    print(mp.keySet(map_respuesta))
+        
+
+
+
 
 
 

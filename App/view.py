@@ -60,6 +60,9 @@ while True:
         pass
     elif int(inputs[0]) == 3:
          controller.Requerimiento2(analyzer)
+    elif int(inputs[0]) == 6:
+        landing_point_id = input('Ingrese el landing point id: ')
+        controller.Requerimiento5(analyzer, landing_point_id)
     else:
         sys.exit(0)
 sys.exit(0)

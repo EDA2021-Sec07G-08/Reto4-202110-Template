@@ -76,6 +76,9 @@ def Requerimiento2(analyzer):
     print('entre')
     return model.Requerimiento2(analyzer)
 
+def Requerimiento5(analyzer, landing_point_id):
+    return model.Requerimiento5(analyzer,landing_point_id)
+
 
 
 # Funciones de ordenamiento
