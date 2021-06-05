@@ -151,6 +151,9 @@ def addConnection(analyzer, connection):
 
     containsA = gr.containsVertex(analyzer['connections'], verticeA)
     containsB = gr.containsVertex(analyzer['connections'], verticeB)
+
+    if containsA and containsB:
+        gr.addEdge(analyzer['connections'], verticeA, verticeB, cable_lenght)
     if not containsA and not containsB:
         gr.insertVertex(analyzer['connections'], verticeA)
         gr.insertVertex(analyzer['connections'], verticeB)
@@ -175,6 +178,8 @@ def addConnection_directed(analyzer, connection):
     verticeA = "<{}>-<{}>".format(origin, cable_id)
     verticeB = "<{}>-<{}>".format(destination, cable_id)
 
+    print(verticeA, verticeB)
+
     containsA = gr.containsVertex(analyzer['connections_directed'], verticeA)
     containsB = gr.containsVertex(analyzer['connections_directed'], verticeB)
     if not containsA and not containsB:
@@ -190,7 +195,8 @@ def addConnection_directed(analyzer, connection):
         valor = me.getValue(pareja)
         lista_cables = valor['cables']
         lt.addLast(lista_cables, verticeA)
-    gr.addEdge(analyzer['connections_directed'], verticeA, verticeB, cable_lenght)
+
+        gr.addEdge(analyzer['connections_directed'], verticeA, verticeB, cable_lenght)
 
 def addSameOrigin(analyzer):
 
