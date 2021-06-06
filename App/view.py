@@ -26,6 +26,8 @@ import controller
 from DISClib.ADT import list as lt
 assert cf
 from DISClib.ADT import graph as gr
+from DISClib.ADT import map as mp
+from DISClib.ADT import orderedmap as om
 
 
 """
@@ -55,8 +57,9 @@ while True:
         data = controller.loadData(analyzer)
         grafo = analyzer['connections']
         grafo_direc = analyzer['connections_directed']
-        print(gr.numEdges(grafo))
-        print(gr.numEdges(grafo_direc))
+        print('El numero de landing points es: '+str(om.size(analyzer['landing_points'])))
+        print('El numero total de paises es: '+ str(mp.size(analyzer['countries'])))
+        print('El numero de conexiones entre landing points (arcos) es: '+ str(gr.numEdges(analyzer['connections'])))
 
     elif int(inputs[0]) == 2:
         landing1 = input('Ingrese el nombre del landing point 1: ')
