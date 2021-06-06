@@ -80,6 +80,9 @@ def Requerimiento1(analyzer,landing1,landing2):
 def Requerimiento2(analyzer):
     return model.Requerimiento2(analyzer)
 
+def Requerimiento4(analyzer):
+    return model.Requerimiento4(analyzer)
+
 def Requerimiento5(analyzer, landing_point_id):
     return model.Requerimiento5(analyzer,landing_point_id)
 

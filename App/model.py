@@ -27,6 +27,7 @@
 
 from DISClib.DataStructures.arraylist import newList
 from DISClib.DataStructures.chaininghashtable import contains
+from DISClib.Algorithms.Graphs import prim as pr
 import config as cf
 from DISClib.ADT import list as lt
 from DISClib.ADT import map as mp
@@ -290,6 +291,33 @@ def Requerimiento2(analyzer):
         print(vertix)
         print(vert_adya)
         lt.addLast(listaR,(vert_adya,vertix))
+
+def Requerimiento4(analyzer):
+
+    total = 0
+
+    grafo = analyzer['connections']
+
+    mst = pr.PrimMST(grafo)
+
+    map_distTo = mst['distTo']
+
+    values = mp.valueSet(map_distTo)
+
+    for i in range(lt.size(values)):
+        value = lt.getElement(values, i)
+        total += value
+
+    total = round(total, 2)
+
+    nodos = lt.size(values)
+
+    print('El minimo numero de nodos conectados a la red de expasion minima es: '+str(nodos))
+    print('El costo total (en kilometros) de la red de expansion minima es de: ' + str(total) + ' km')
+        
+
+
+
 
 
 def Requerimiento5(analyzer, landing_point_name):
