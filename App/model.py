@@ -269,16 +269,24 @@ def Requerimiento1(analyzer,landing1,landing2):
     analyzer['element'] = scc.KosarajuSCC(analyzer['connections_directed'])
     cluster_number = scc.connectedComponents(analyzer['element'])
     get_landing1 = mp.get(analyzer['landing_names_id'],landing1)
-    id_landing1 = me.getValue(get_landing1) 
+    id_landing1 = me.getValue(get_landing1)
+    dict_landing_pareja1 = om.get(analyzer['landing_points'], id_landing1)
+    dict_landing1 = me.getValue(dict_landing_pareja1)
+    lista_cables1 = dict_landing1['cables']
+    vectorA = lt.getElement(lista_cables1, 1) 
     get_landing2 = mp.get(analyzer['landing_names_id'],landing2)
     id_landing2 = me.getValue(get_landing2)
-    inform_cluster = scc.stronglyConnected(analyzer['element'],id_landing1,id_landing2)
+    dict_landing_pareja2 = om.get(analyzer['landing_points'], id_landing2)
+    dict_landing2 = me.getValue(dict_landing_pareja2)
+    lista_cables2 = dict_landing1['cables']
+    vectorB = lt.getElement(lista_cables2, 1) 
+    inform_cluster = scc.stronglyConnected(analyzer['element'],vectorA, vectorB)
 
     if inform_cluster == False:
         print('Los landing points consultados no estan en el mismo cluster')
     else:
         print('Los landing points cosnultados se encuentran en el mismo cluster')
-        print('El total de clústers presentes en la red es igual a '+ cluster_number)
+        print('El total de clústers presentes en la red es igual a '+ str(cluster_number))
 
 def Requerimiento2(analyzer):
     vertic = gr.vertices(analyzer['connections'])
