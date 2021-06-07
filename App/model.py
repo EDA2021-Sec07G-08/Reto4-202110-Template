@@ -38,7 +38,9 @@ from DISClib.ADT import graph as gr
 from DISClib import haversine as hs
 assert cf
 from DISClib.Algorithms.Graphs import scc
-
+from DISClib.Algorithms.Graphs import dijsktra as dij
+from DISClib.DataStructures import listiterator as it 
+from DISClib.Algorithms.Sorting import mergesort as merg
 """
 Se define la estructura de un catálogo de videos. El catálogo tendrá dos listas, una para los videos, otra para las categorias de
 los mismos.
@@ -51,6 +53,7 @@ def newAnalyzer():
     analyzer = {
                 'vertices':None,
                 'element':None,
+                'camino':None,
                 'landing_names_id':None,
                 'info_landings': None,
                 'landing_points' : None,
@@ -288,28 +291,41 @@ def Requerimiento1(analyzer,landing1,landing2):
         print('Los landing points cosnultados se encuentran en el mismo cluster')
         print('El total de clústers presentes en la red es igual a '+ str(cluster_number))
 
+def sorting2(lista,size,cmpfunction_merge):
+    sub_list = lt.subList(lista,0, size)
+    sub_list = lista.copy()
+    sorted_list=merg.sort(sub_list, cmpfunction_merge)
+    return  sorted_list
+
+def cmpfunction_merge(vertex1, vertex2):
+    return (float(vertex1[1]) > float(vertex2[1]))
+
 def Requerimiento2(analyzer):
     vertic = gr.vertices(analyzer['connections'])
-    mapaR = mp.newMap()
-    listaR = lt.newList()
+    listaR = lt.newList('SINGLE_LINKED')
+    iterator = it.newIterator(vertic)
+    while it.hasNext(iterator):
+        posi = it.next(iterator)
+        vert_adya = gr.degree(analyzer['connections'],posi)
+        lt.addLast(listaR,(posi,vert_adya))
+    res = sorting2(listaR,10,cmpfunction_merge)
+    return res
+
     
-    for i in range (0,lt.size(vertic)):
-        vertix = lt.getElement(vertic,i)
-        vert_adya = gr.degree(analyzer['connections'],vertix)
-        print(vertix)
-        print(vert_adya)
-        lt.addLast(listaR,(vert_adya,vertix))
+def Requerimiento3 (analyzer,pais_a,pais_b):
+    vertice_a = pais_a
+    vertice_b = pais_b
+    analyzer['caminos'] = dij.Dijkstra(analyzer['connections'],vertice_a)
+    ruta = dij.pathTo(analyzer['connection'],vertice_b)
+    distancia = dij.distTo(analyzer['connections'],vertice_b)
+    return ruta , distancia
 
 def Requerimiento4(analyzer):
 
     total = 0
-
     grafo = analyzer['connections']
-
     mst = pr.PrimMST(grafo)
-
     map_distTo = mst['distTo']
-
     values = mp.valueSet(map_distTo)
 
     for i in range(lt.size(values)):
@@ -324,14 +340,9 @@ def Requerimiento4(analyzer):
     print('El costo total (en kilometros) de la red de expansion minima es de: ' + str(total) + ' km')
         
 
-
-
-
-
 def Requerimiento5(analyzer, landing_point_name):
 
     map_respuesta = mp.newMap()
-
     #encontrar codigo con nombre
 
     mapa_codigo = analyzer['landing_names_id']
@@ -349,15 +360,10 @@ def Requerimiento5(analyzer, landing_point_name):
         vertice = lt.getElement(lista_vertices, i)
         arcos_vertice = gr.adjacents(analyzer['connections'], vertice)
         for i in range(lt.size(arcos_vertice)):
-
             vertice2 = lt.getElement(arcos_vertice, i)
-
-
             tuple_vertice2 = vertice2.replace('<','').replace('>', '').split('-')
             origen = tuple_vertice2[0]
-
             contains_landing = om.contains(analyzer['landing_points'], origen)
-
             if contains_landing:
 
             #extraer pais del origen
@@ -365,9 +371,7 @@ def Requerimiento5(analyzer, landing_point_name):
                 pareja_origen = om.get(analyzer['landing_points'], origen)
                 dict_origen = me.getValue(pareja_origen)
                 pais = dict_origen['country']
-
                 contains_country = mp.contains(map_respuesta, pais)
-
                 if not contains_country:
                     mp.put(map_respuesta, pais, 0)
 

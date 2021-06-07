@@ -42,6 +42,9 @@ def printMenu():
     print("1- Cargar información en el catálogo")
     print("2 - Requerimiento 1")
     print('3 - Requerimiento 2')
+    print('4 - Requerimiento 3')
+    print('5 - Requerimiento 4')
+    print('6 - Requerimiento 5')
 
 catalog = None
 
@@ -67,7 +70,19 @@ while True:
         controller.Requerimiento1(analyzer,landing1,landing2)
         
     elif int(inputs[0]) == 3:
-         controller.Requerimiento2(analyzer)
+        ans = controller.Requerimiento2(analyzer)
+        j = 0
+        for i in lt.iterator(ans):
+            j += 1
+            if j == 11:
+                break
+            print(i)
+
+
+    elif int(inputs[0]) == 4:
+        pais_a = input('Ingrese el nombre del país A: ')
+        pais_b = input('Ingrese el nombre del país B: ')
+        controller.Requerimiento3(analyzer,pais_a,pais_b)
 
     elif int(inputs[0]) == 5:
         controller.Requerimiento4(analyzer)
